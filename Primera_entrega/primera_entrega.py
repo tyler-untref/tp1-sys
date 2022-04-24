@@ -4,8 +4,8 @@ import soundfile as sf
 from scipy import signal
 from scipy.io.wavfile import write
 import numpy as np
-import sounddevice as
-import soundfile as sf sd
+import sounddevice as sd
+import soundfile as sf 
 import pandas as pd
 # from matplotlib import pyplot as plt
 
