@@ -8,7 +8,7 @@ import soundfile as sf
 import pandas as pd
 # import matplotlib.pyplot as plt
 
-fs=44100
+# fs=44100
 
 def ruidoRosa_voss(t, fs=44100, ncols=16):
 
