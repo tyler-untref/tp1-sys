@@ -63,3 +63,6 @@ def dominio_temporal(t,fs):
     return plt.show()
 
 dominio_temporal(10,44100)
+
+#Tercera consigna:
+
