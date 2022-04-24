@@ -3,11 +3,10 @@ import scipy
 import soundfile as sf
 from scipy import signal
 from scipy.io.wavfile import write
-import numpy as np
 import sounddevice as sd
 import soundfile as sf 
 import pandas as pd
-# from matplotlib import pyplot as plt
+# import matplotlib.pyplot as plt
 
 fs=44100
 
@@ -48,11 +47,10 @@ ruido_rosa = ruidoRosa_voss(10)
 # data = amplitude*ruido_rosa 
 # wav = write('ruido rosa', int(fs/10), data.astype(np.int16))
 
-sf.write('ruido rosa', ruido_rosa, fs,)
+# sf.write('ruido rosa', ruido_rosa, fs,)
 
 #eje_x = np.array([len(10*fs)])
 
-#yeah = sd.play(ruido_rosa)
 
-# sd.play(ruido_rosa, 44100)
-# sd.wait()
+sd.play(ruido_rosa, 44100)
+sd.wait()
