@@ -1,0 +1,26 @@
+    Genera ruido rosa utilizando el algoritmo de Voss-McCartney(https://www.dsprelated.com/showabstract/3933.php).
+
+    .. Nota:: si 'ruidoRosa.wav' existe, este será sobreescrito
+
+    Parametros
+    ----------
+    t : float
+        Valor temporal en segundos, este determina la duración del ruido generado.
+    rcols: int
+        Determina el número de fuentes a aleatorias a agregar.
+    fs: int
+        Frecuencia de muestreo en Hz de la señal. Por defecto el valor es 44100 Hz.
+
+    returns: NumPy array
+        Datos de la señal generada.
+
+    Ejemplo
+    -------
+    Generar un `.wav` desde un numpy array de 10 segundos con ruido rosa a una
+    frecuencia de muestreo de 44100 Hz.
+
+        import numpy as np
+        import soundfile as sf
+        from scipy import signal
+
+        ruidoRosa_voss(10)
