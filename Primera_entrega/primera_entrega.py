@@ -6,9 +6,9 @@ from scipy.io.wavfile import write
 import sounddevice as sd
 import soundfile as sf 
 import pandas as pd
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
-# fs=44100
+#Primera consigna:
 
 def ruidoRosa_voss(t, fs=44100, ncols=16):
 
@@ -37,20 +37,29 @@ def ruidoRosa_voss(t, fs=44100, ncols=16):
     total = total / valor_max
 
     # Agregar generación de archivo de audio .wav
-    #wav = write('ruido rosa', int(fs/10), total.astype(np.int16))
+    sf.write('ruido_rosa.wav', total, fs)
 
     return total
 
 ruido_rosa = ruidoRosa_voss(10)
 
-# amplitude = np.iinfo(np.int16).max
-# data = amplitude*ruido_rosa 
-# wav = write('ruido rosa', int(fs/10), data.astype(np.int16))
+#Prueba:
+#sd.play(ruido_rosa, 44100)
+#sd.wait()
 
-# sf.write('ruido rosa', ruido_rosa, fs,)
+#Segunda consigna:
+def dominio_temporal(t,fs):
 
-#eje_x = np.array([len(10*fs)])
+    #Eje x: tiempo
+    eje_x = np.linspace(0,t+1,t*fs)
+    plt.xlabel("Tiempo (s)")
+    
+    #Eje y: amplitud normalizada
+    eje_y = ruido_rosa
+    plt.ylabel("Amplitud Normalizada")
+    
+    plt.title("Gráfico: dominio temporal de la señal")
+    plt.plot(eje_x, eje_y)
+    return plt.show()
 
-
-sd.play(ruido_rosa, 44100)
-sd.wait()
+dominio_temporal(10,44100)
