@@ -1,12 +1,9 @@
 import numpy as np
-import scipy
-import soundfile as sf
-from scipy import signal
-from scipy.io.wavfile import write
-import sounddevice as sd
 import soundfile as sf 
 import pandas as pd
 import matplotlib.pyplot as plt
+
+#Parte 1: Función de sintetización de ruido rosa
 
 #Primera consigna:
 
@@ -43,11 +40,8 @@ def ruidoRosa_voss(t, fs=44100, ncols=16):
 
 ruido_rosa = ruidoRosa_voss(10)
 
-#Prueba:
-#sd.play(ruido_rosa, 44100)
-#sd.wait()
-
 #Segunda consigna:
+
 def dominio_temporal(t,fs):
 
     #Eje x: tiempo
@@ -66,3 +60,6 @@ dominio_temporal(10,44100)
 
 #Tercera consigna:
 
+#Parte 2: Funcion de generación de sine sweep logaritmico + filtro inverso
+
+#Parte 3: Función adquisicion y reproducción
