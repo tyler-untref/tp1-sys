@@ -46,27 +46,14 @@ sine_sweep = sine_sweep(10, 20, 20000, 44100)
 
 # Filtro inverso ?
 
+#Reproducción de los resultados 
+
 sd.play(sine_sweep)
-#sd.wait()
+sd.wait()
 
-# Gráfico de la señal:
 
-def dominio_temporal(t,fs):
+# Segundo punto: Gráfico del espectro
 
-    #Eje x: tiempo
-    eje_x = np.linspace(0,t+1,t*fs)
-    plt.xlabel("Tiempo (s)")
-    
-    #Eje y: amplitud 
-    eje_y = sine_sweep
-    plt.ylabel("Amplitud")
-    
-    plt.title("Gráfico: dominio temporal de la señal")
-    plt.plot(eje_x, eje_y)
-    return plt.show()
 
-dominio_temporal(10,44100)
-
-# Segundo punto: gráfico del espectro
 
 
