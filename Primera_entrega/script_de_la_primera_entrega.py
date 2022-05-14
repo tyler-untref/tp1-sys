@@ -80,9 +80,13 @@ ruido_rosa = ruidoRosa_voss(10,44100,16)
 # Segundo punto: gráfico del dominio temporal
 
 def dominio_temporal(t,fs):
-
+    """
+    Genera un array de t segundos con n = t*fs muestras y plotea 
+    la amplitud de la función ruido rosa dependiente del tiempo 
+    
+    """
     #Eje x: tiempo
-    eje_x = np.linspace(0,t+1,t*fs)
+    eje_x = np.linspace(0,t,t*fs)
     plt.xlabel("Tiempo (s)")
     
     #Eje y: amplitud normalizada
@@ -127,7 +131,7 @@ sd.wait()
 
 # Primer punto: definición de la función
 
-def sine_sweep(t, w1, w2, fs):
+def sine_sweep(t, f1, f2, fs):
     
     """
     Genera un Sine Sweep utilizando las ecuaciones de Meng, Q.
@@ -136,10 +140,10 @@ def sine_sweep(t, w1, w2, fs):
     ----------
     t : float
         Valor temporal en segundos, este determina la duración del sine sweep.
-    w1 : int
-         Frecuencia angular inferior en rad/s
-    w2 : int
-        Frecuencia angular superior en rad/s.
+    f1 : int
+         Frecuencia inferior en Hz.
+    f2 : int
+        Frecuencia superior en Hz.
     fs : int
         Frecuencia de muestreo en Hz de la señal. Por defecto el valor es 44100 Hz.    
 
@@ -148,7 +152,8 @@ def sine_sweep(t, w1, w2, fs):
     -------
     None.
     """
-    
+    w1 = 2*np.pi*f1
+    w2 = 2*np.pi*f2
     tiempo = np.linspace(0,t+1,t*fs)
     R = np.log(w2/w1)
     L = t/R

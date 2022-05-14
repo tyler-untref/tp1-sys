@@ -54,6 +54,22 @@ sd.wait()
 
 # Segundo punto: Gráfico del espectro
 
+#Lee el archivo .txt
+df = pd.read_csv(r'C:\Users\Tyler\Documents\UNTREF\Señales_y_sistemas\Práctica\TP\tp1-sys\Primera_entrega\espectro_sine_sweep.txt', delimiter="\t")
+#Lo convierte a un array
+array = df.to_numpy()
 
+#Eje x: frecuencia
+eje_x = array[:,0]
+plt.xlabel("Frecuencia (Hz)")
 
+#Eje y: amplitud
+eje_y = array[0,:]
+plt.ylabel("Amplitud (dB)")
+
+plt.title("Gráfico: Espectro de la señal")
+plt.plot(eje_x, eje_y)
+grafico = plt.show() 
+
+#El problema es que las dimensiones tienen que ser iguales
 
