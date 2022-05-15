@@ -125,6 +125,7 @@ grafico = plt.show()
 sd.play(ruido_rosa,44100)
 sd.wait()
 
+
 #-----------------------------------------------------------------------------
 
 # Segunda consigna: Funcion de generación de sine sweep logaritmico + filtro inverso
@@ -134,7 +135,8 @@ sd.wait()
 def sine_sweep(t, f1, f2, fs):
     
     """
-    Genera un Sine Sweep utilizando las ecuaciones de Meng, Q.
+    Genera un Sine Sweep utilizando las ecuaciones de Meng, Q. y su filtro
+    inverso. 
     
     Parametros
     ----------
@@ -147,7 +149,7 @@ def sine_sweep(t, f1, f2, fs):
     fs : int
         Frecuencia de muestreo en Hz de la señal. Por defecto el valor es 44100 Hz.    
 
-    Returns: NumPy array
+    Returns: 2 NumPy array
         Datos de la señal generada.
     -------
     None.
@@ -159,12 +161,18 @@ def sine_sweep(t, f1, f2, fs):
     L = t/R
     K = (t*w1)/R
 
-    resultado = np.sin(K*(np.exp(tiempo/L)-1))
-
-    # Generación del archivo .wav
-    sf.write('sine_sweep.wav', resultado, 44100)
+    frec_inst = (K/L)*np.exp(tiempo/L)
+    mod_m = w1/2*np.pi*(frec_inst)
     
-    return resultado
+    sine_sweep_t = np.sin(K*(np.exp(tiempo/L)-1))
+    
+    sine_sweep_t_despl = np.sin(K*(np.exp(-tiempo/L)-1))
+    filtro_inverso = mod_m*sine_sweep_t_despl
+    
+    # Generación del archivo .wav
+    sf.write('sine_sweep.wav', sine_sweep_t, 44100)
+    sf.write('filtro_inverso.wav', filtro_inverso, 44100)
+    return sine_sweep_t, filtro_inverso 
 
 sine_sweep = sine_sweep(10, 20, 20000, 44100)
 
@@ -172,8 +180,6 @@ sine_sweep = sine_sweep(10, 20, 20000, 44100)
 
 sd.play(sine_sweep)
 sd.wait()
-
-# Filtro inverso ?
 
 # Segundo punto: Gráfico del espectro
 
