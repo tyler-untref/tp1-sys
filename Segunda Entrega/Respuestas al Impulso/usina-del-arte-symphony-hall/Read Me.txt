@@ -1,0 +1,250 @@
+
+Format(s): 
+Mono
+Stereo (Stereo Files)
+B-Format (4 Channel Files)
+
+Mono: 
+
+    ir_posic5-pb_-_sfdc.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 1
+Bits per Sample: 32
+Duration: 3.04 s
+File Size: 570.43 KB
+File Format: wav
+Microphone: Earthworks M50
+
+
+    ir_posic5-1erpiso_-_sfdc.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 1
+Bits per Sample: 32
+Duration: 3.7 s
+File Size: 693.79 KB
+File Format: wav
+Microphone: Earthworks M50
+
+
+    ir_posic4-1erpiso_-_sfdc.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 1
+Bits per Sample: 32
+Duration: 3.4 s
+File Size: 637.54 KB
+File Format: wav
+Microphone: Earthworks M50
+
+
+    ir_posic2-pb_-_sfdc.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 1
+Bits per Sample: 32
+Duration: 3.13 s
+File Size: 587.61 KB
+File Format: wav
+Microphone: Earthworks M50
+
+
+    ir_posic3-pb_-_sfdc.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 1
+Bits per Sample: 32
+Duration: 2.9 s
+File Size: 543.79 KB
+File Format: wav
+Microphone: Earthworks M50
+
+
+    ir_posic2-pb.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 1
+Bits per Sample: 16
+Duration: 3.13 s
+File Size: 293.82 KB
+File Format: wav
+Microphone: Earthworks M50
+
+
+    ir_posic3-1erpiso_-_sfdc.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 1
+Bits per Sample: 32
+Duration: 4.6 s
+File Size: 862.54 KB
+File Format: wav
+Microphone: Earthworks M50
+
+
+    ir_stage_-_sfdc.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 1
+Bits per Sample: 32
+Duration: 10.81 s
+File Size: 1.98 MB
+File Format: wav
+Microphone: Earthworks M50
+
+Stereo: 
+
+    usina_main_s1_p5.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 2
+Bits per Sample: 16
+Duration: 2.27 s
+File Size: 428.49 KB
+File Format: wav
+Microphone: Kemar dummy-head with pinnae simulator
+
+
+    usina_main_s2_p5.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 2
+Bits per Sample: 16
+Duration: 2.15 s
+File Size: 405.06 KB
+File Format: wav
+Microphone: Kemar dummy-head with pinnae simulator
+
+
+    usina_main_s2_p4.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 2
+Bits per Sample: 16
+Duration: 1.95 s
+File Size: 368.28 KB
+File Format: wav
+Microphone: Kemar dummy-head with pinnae simulator
+
+
+    usina_main_s1_p4.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 2
+Bits per Sample: 16
+Duration: 1.92 s
+File Size: 362.81 KB
+File Format: wav
+Microphone: Kemar dummy-head with pinnae simulator
+
+
+    usina_main_s2_p3.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 2
+Bits per Sample: 16
+Duration: 2.11 s
+File Size: 397.73 KB
+File Format: wav
+Microphone: Kemar dummy-head with pinnae simulator
+
+
+    usina_main_s1_p3.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 2
+Bits per Sample: 16
+Duration: 1.95 s
+File Size: 367.21 KB
+File Format: wav
+Microphone: Kemar dummy-head with pinnae simulator
+
+
+    usina_main_s2_p2.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 2
+Bits per Sample: 16
+Duration: 2.18 s
+File Size: 411.01 KB
+File Format: wav
+Microphone: Kemar dummy-head with pinnae simulator
+
+
+    usina_main_s1_p2.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 2
+Bits per Sample: 16
+Duration: 2.12 s
+File Size: 399.36 KB
+File Format: wav
+Microphone: Kemar dummy-head with pinnae simulator
+
+
+    usina_main_s2_p1.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 2
+Bits per Sample: 16
+Duration: 1.76 s
+File Size: 332.38 KB
+File Format: wav
+Microphone: Kemar dummy-head with pinnae simulator
+
+
+    usina_main_s1_p1.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 2
+Bits per Sample: 16
+Duration: 1.85 s
+File Size: 348.84 KB
+File Format: wav
+Microphone: Kemar dummy-head with pinnae simulator
+
+B-Format: Multichannel: 
+
+    ir_w_m5.s1.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 1
+Bits per Sample: 16
+Duration: 4.61 s
+File Size: 444.06 KB
+File Format: wav
+Microphone: Soundfield!SPS200
+
+
+    ir_z_m5.s1.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 1
+Bits per Sample: 16
+Duration: 4.61 s
+File Size: 444.06 KB
+File Format: wav
+Microphone: Soundfield!SPS200
+
+
+    ir_x_m5.s1.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 1
+Bits per Sample: 16
+Duration: 4.61 s
+File Size: 444.06 KB
+File Format: wav
+Microphone: Soundfield!SPS200
+
+
+    ir_y_m5.s1.wav
+
+Sample Rate: 48 kHz
+Number of Channels: 1
+Bits per Sample: 16
+Duration: 4.61 s
+File Size: 444.06 KB
+File Format: wav
+Microphone: Soundfield!SPS200
