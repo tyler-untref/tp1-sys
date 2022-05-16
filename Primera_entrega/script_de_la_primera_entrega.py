@@ -10,7 +10,7 @@ import numpy as np
 import soundfile as sf 
 import sounddevice as sd
 import pandas as pd
-import matplotlib.pyplot as plt
+# import matplotlib.pyplot as plt
 
 # Primera consigna: Función de sintetización de ruido rosa
 
@@ -77,50 +77,50 @@ def ruidoRosa_voss(t,fs,ncols):
 
 ruido_rosa = ruidoRosa_voss(10,44100,16)
 
-# Segundo punto: gráfico del dominio temporal
+# # Segundo punto: gráfico del dominio temporal
 
-def dominio_temporal(t,fs):
-    """
-    Genera un array de t segundos con n = t*fs muestras y plotea 
-    la amplitud de la función ruido rosa dependiente del tiempo 
+# def dominio_temporal(t,fs):
+#     """
+#     Genera un array de t segundos con n = t*fs muestras y plotea 
+#     la amplitud de la función ruido rosa dependiente del tiempo 
     
-    """
-    #Eje x: tiempo
-    eje_x = np.linspace(0,t,t*fs)
-    plt.xlabel("Tiempo (s)")
+#     """
+#     #Eje x: tiempo
+#     eje_x = np.linspace(0,t,t*fs)
+#     plt.xlabel("Tiempo (s)")
     
-    #Eje y: amplitud normalizada
-    eje_y = ruido_rosa
-    plt.ylabel("Amplitud Normalizada")
+#     #Eje y: amplitud normalizada
+#     eje_y = ruido_rosa
+#     plt.ylabel("Amplitud Normalizada")
     
-    plt.title("Gráfico: dominio temporal de la señal")
-    plt.plot(eje_x, eje_y)
-    return plt.show()
+#     plt.title("Gráfico: dominio temporal de la señal")
+#     plt.plot(eje_x, eje_y)
+#     return plt.show()
 
-dominio_temporal(10,44100)
+# dominio_temporal(10,44100)
 
-# Tercer punto: gráfico del domino espectral
+# # Tercer punto: gráfico del domino espectral
 
-#Lee el archivo .txt
-df = pd.read_csv(r'C:\Users\Tyler\Documents\UNTREF\Señales_y_sistemas\Práctica\TP\tp1-sys\Primera_entrega\espectro-ruido_rosa.txt', delimiter="\t")
-#Lo convierte a un array
-array = df.to_numpy()
+# #Lee el archivo .txt
+# df = pd.read_csv(r'C:\Users\Tyler\Documents\UNTREF\Señales_y_sistemas\Práctica\TP\tp1-sys\Primera_entrega\espectro-ruido_rosa.txt', delimiter="\t")
+# #Lo convierte a un array
+# array = df.to_numpy()
 
-#Eje x: frecuencia
-eje_x = array[:,0]
-plt.xlabel("Frecuencia (Hz)")
+# #Eje x: frecuencia
+# eje_x = array[:,0]
+# plt.xlabel("Frecuencia (Hz)")
 
-#Eje y: amplitud
-eje_y = array[0,:]
-plt.ylabel("Amplitud (dB)")
+# #Eje y: amplitud
+# eje_y = array[0,:]
+# plt.ylabel("Amplitud (dB)")
 
-plt.title("Gráfico: Espectro de la señal")
-plt.plot(eje_x, eje_y)
-grafico = plt.show() 
+# plt.title("Gráfico: Espectro de la señal")
+# plt.plot(eje_x, eje_y)
+# grafico = plt.show() 
 
-#El problema es que las dimensiones tienen que ser iguales
+# #El problema es que las dimensiones tienen que ser iguales
 
-# Cuarto punto:
+
 
 sd.play(ruido_rosa,44100)
 sd.wait()
@@ -156,7 +156,7 @@ def sine_sweep(t, f1, f2, fs):
     """
     w1 = 2*np.pi*f1
     w2 = 2*np.pi*f2
-    tiempo = np.linspace(0,t+1,t*fs)
+    tiempo = np.linspace(0,t,t*fs)
     R = np.log(w2/w1)
     L = t/R
     K = (t*w1)/R
@@ -181,26 +181,26 @@ sine_sweep = sine_sweep(10, 20, 20000, 44100)
 sd.play(sine_sweep)
 sd.wait()
 
-# Segundo punto: Gráfico del espectro
+# # Segundo punto: Gráfico del espectro
 
-#Lee el archivo .txt
-df = pd.read_csv(r'C:\Users\Tyler\Documents\UNTREF\Señales_y_sistemas\Práctica\TP\tp1-sys\Primera_entrega\espectro_sine_sweep.txt', delimiter="\t")
-#Lo convierte a un array
-array = df.to_numpy()
+# #Lee el archivo .txt
+# df = pd.read_csv(r'C:\Users\Tyler\Documents\UNTREF\Señales_y_sistemas\Práctica\TP\tp1-sys\Primera_entrega\espectro_sine_sweep.txt', delimiter="\t")
+# #Lo convierte a un array
+# array = df.to_numpy()
 
-#Eje x: frecuencia
-eje_x = array[:,0]
-plt.xlabel("Frecuencia (Hz)")
+# #Eje x: frecuencia
+# eje_x = array[:,0]
+# plt.xlabel("Frecuencia (Hz)")
 
-#Eje y: amplitud
-eje_y = array[0,:]
-plt.ylabel("Amplitud (dB)")
+# #Eje y: amplitud
+# eje_y = array[0,:]
+# plt.ylabel("Amplitud (dB)")
 
-plt.title("Gráfico: Espectro de la señal")
-plt.plot(eje_x, eje_y)
-grafico = plt.show() 
+# plt.title("Gráfico: Espectro de la señal")
+# plt.plot(eje_x, eje_y)
+# grafico = plt.show() 
 
-#El problema es que las dimensiones tienen que ser iguales
+# #El problema es que las dimensiones tienen que ser iguales
 
 
 #-----------------------------------------------------------------------------
