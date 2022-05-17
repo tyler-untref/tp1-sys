@@ -10,198 +10,195 @@ import numpy as np
 import soundfile as sf 
 import sounddevice as sd
 import pandas as pd
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
-# # Primera consigna: Función de sintetización de ruido rosa
+# Primera consigna: Función de sintetización de ruido rosa
 
-# # Primer punto: definición de la función
+# Primer punto: definición de la función
 
-# def ruidoRosa_voss(t,fs,ncols):
-#     """
-#     Genera ruido rosa utilizando el algoritmo de Voss-McCartney(https://www.dsprelated.com/showabstract/3933.php).
+def ruidoRosa_voss(t,fs,ncols):
+    """
+    Genera ruido rosa utilizando el algoritmo de Voss-McCartney(https://www.dsprelated.com/showabstract/3933.php).
     
-#     .. Nota:: si 'ruidoRosa.wav' existe, este será sobreescrito
+    .. Nota:: si 'ruidoRosa.wav' existe, este será sobreescrito
     
-#     Parametros
-#     ----------
-#     t : float
-#         Valor temporal en segundos, este determina la duración del ruido generado.
-#     ncols: int
-#         Determina el número de fuentes aleatorias a agregar.
-#     fs: int
-#         Frecuencia de muestreo en Hz de la señal. Por defecto el valor es 44100 Hz.
+    Parametros
+    ----------
+    t : float
+        Valor temporal en segundos, este determina la duración del ruido generado.
+    ncols: int
+        Determina el número de fuentes aleatorias a agregar.
+    fs: int
+        Frecuencia de muestreo en Hz de la señal. Por defecto el valor es 44100 Hz.
     
-#     returns: NumPy array
-#         Datos de la señal generada.
+    returns: NumPy array
+        Datos de la señal generada.
     
-#     Ejemplo
-#     -------
-#     Generar un `.wav` desde un numpy array de 10 segundos con ruido rosa a una 
-#     frecuencia de muestreo de 44100 Hz.
+    Ejemplo
+    -------
+    Generar un `.wav` desde un numpy array de 10 segundos con ruido rosa a una 
+    frecuencia de muestreo de 44100 Hz.
     
-#         import numpy as np
-#         import soundfile as sf
-#         from scipy import signal
+        import numpy as np
+        import soundfile as sf
+        from scipy import signal
         
-#         ruidoRosa_voss(10)
-#     """
+        ruidoRosa_voss(10)
+    """
 
-#     nrows = int(float(t)*fs)
+    nrows = int(float(t)*fs)
 
-#     array = np.full((nrows, ncols), np.nan)
-#     array[0, :] = np.random.random(ncols)
-#     array[:, 0] = np.random.random(nrows)
+    array = np.full((nrows, ncols), np.nan)
+    array[0, :] = np.random.random(ncols)
+    array[:, 0] = np.random.random(nrows)
 
-#     # El número total de cambios es nrows
-#     n = nrows
-#     cols = np.random.geometric(0.5, n)
-#     cols[cols >= ncols] = 0
-#     rows = np.random.randint(nrows, size=n)
-#     array[rows, cols] = np.random.random(n)
+    # El número total de cambios es nrows
+    n = nrows
+    cols = np.random.geometric(0.5, n)
+    cols[cols >= ncols] = 0
+    rows = np.random.randint(nrows, size=n)
+    array[rows, cols] = np.random.random(n)
 
-#     df = pd.DataFrame(array)
-#     filled = df.fillna(method='ffill', axis=0)
-#     total = filled.sum(axis=1)
+    df = pd.DataFrame(array)
+    filled = df.fillna(method='ffill', axis=0)
+    total = filled.sum(axis=1)
 
-#     # Centrado del array en 0
-#     total = total - total.mean()
+    # Centrado del array en 0
+    total = total - total.mean()
 
-#     # Normalizado
-#     valor_max = max(abs(max(total)), abs(min(total)))
-#     total = total / valor_max
+    # Normalizado
+    valor_max = max(abs(max(total)), abs(min(total)))
+    total = total / valor_max
 
-#     # Agregar generación de archivo de audio .wav
-#     sf.write('ruido_rosa.wav', total, fs)
+    # Agregar generación de archivo de audio .wav
+    sf.write('ruido_rosa.wav', total, fs)
 
-#     return total
+    return total
 
-# ruido_rosa = ruidoRosa_voss(10,44100,16)
+ruido_rosa = ruidoRosa_voss(10,44100,16)
 
-# # Segundo punto: gráfico del dominio temporal
+# Segundo punto: gráfico del dominio temporal
 
-# def dominio_temporal(t,fs):
-#     """
-#     Genera un array de t segundos con n = t*fs muestras y plotea 
-#     la amplitud de la función ruido rosa dependiente del tiempo 
+def dominio_temporal(t,fs):
+    """
+    Genera un array de t segundos con n = t*fs muestras y plotea 
+    la amplitud de la función ruido rosa dependiente del tiempo 
     
-#     """
-#     #Eje x: tiempo
-#     eje_x = np.linspace(0,t,t*fs)
-#     plt.xlabel("Tiempo (s)")
+    """
+    #Eje x: tiempo
+    eje_x = np.linspace(0,t,t*fs)
+    plt.xlabel("Tiempo (s)")
     
-#     #Eje y: amplitud normalizada
-#     eje_y = ruido_rosa
-#     plt.ylabel("Amplitud Normalizada")
+    #Eje y: amplitud normalizada
+    eje_y = ruido_rosa
+    plt.ylabel("Amplitud Normalizada")
     
-#     plt.title("Gráfico: dominio temporal de la señal")
-#     plt.plot(eje_x, eje_y)
-#     return plt.show()
+    plt.title("Gráfico: dominio temporal de la señal")
+    plt.plot(eje_x, eje_y)
+    return plt.show()
 
-# dominio_temporal(10,44100)
+dominio_temporal(10,44100)
 
-# # Tercer punto: gráfico del domino espectral
+# Tercer punto: gráfico del domino espectral
 
-# #Lee el archivo .txt
-# df = pd.read_csv(r'C:\Users\Tyler\Documents\UNTREF\Señales_y_sistemas\Práctica\TP\tp1-sys\Primera_entrega\espectro-ruido_rosa.txt', delimiter="\t")
-# #Lo convierte a un array
-# array = df.to_numpy()
+#Lee el archivo .txt
+df = pd.read_csv(r'C:\Users\Tyler\Documents\UNTREF\Señales_y_sistemas\Práctica\TP\tp1-sys\Primera_entrega\espectro-ruido_rosa.txt', delimiter="\t")
+#Lo convierte a un array
+array = df.to_numpy()
 
-# #Eje x: frecuencia
-# eje_x = array[:,0]
-# plt.xlabel("Frecuencia (Hz)")
+#Eje x: frecuencia
+eje_x = array[:,0]
+plt.xlabel("Frecuencia (Hz)")
 
-# #Eje y: amplitud
-# eje_y = array[0,:]
-# plt.ylabel("Amplitud (dB)")
+#Eje y: amplitud
+eje_y = array[0,:]
+plt.ylabel("Amplitud (dB)")
 
-# plt.title("Gráfico: Espectro de la señal")
-# plt.plot(eje_x, eje_y)
-# grafico = plt.show() 
+plt.title("Gráfico: Espectro de la señal")
+plt.plot(eje_x, eje_y)
+grafico = plt.show() 
 
-# #El problema es que las dimensiones tienen que ser iguales
-
-
-
-# sd.play(ruido_rosa,44100)
-# sd.wait()
+#El problema es que las dimensiones tienen que ser iguales
 
 
-# #-----------------------------------------------------------------------------
 
-# # Segunda consigna: Funcion de generación de sine sweep logaritmico + filtro inverso
+sd.play(ruido_rosa,44100)
+sd.wait()
 
-# # Primer punto: definición de la función
 
-# def sine_sweep(t, f1, f2, fs):
+#-----------------------------------------------------------------------------
+
+# Segunda consigna: Funcion de generación de sine sweep logaritmico + filtro inverso
+
+# Primer punto: definición de la función
+
+def sine_sweep(t, f1, f2, fs):
     
-#     """
-#     Genera un Sine Sweep utilizando las ecuaciones de Meng, Q. y su filtro
-#     inverso. 
+    """
+    Genera un Sine Sweep utilizando las ecuaciones de Meng, Q. y su filtro
+    inverso. 
     
-#     Parametros
-#     ----------
-#     t : float
-#         Valor temporal en segundos, este determina la duración del sine sweep.
-#     f1 : int
-#          Frecuencia inferior en Hz.
-#     f2 : int
-#         Frecuencia superior en Hz.
-#     fs : int
-#         Frecuencia de muestreo en Hz de la señal. Por defecto el valor es 44100 Hz.    
+    Parametros
+    ----------
+    t : float
+        Valor temporal en segundos, este determina la duración del sine sweep.
+    f1 : int
+          Frecuencia inferior en Hz.
+    f2 : int
+        Frecuencia superior en Hz.
+    fs : int
+        Frecuencia de muestreo en Hz de la señal. Por defecto el valor es 44100 Hz.    
 
-#     Returns: 2 NumPy array
-#         Datos de la señal generada.
-#     -------
-#     None.
-#     """
-#     w1 = 2*np.pi*f1
-#     w2 = 2*np.pi*f2
-#     tiempo = np.linspace(0,t,t*fs)
-#     R = np.log(w2/w1)
-#     L = t/R
-#     K = (t*w1)/R
+    Returns: 2 NumPy array
+        Datos de la señal generada.
+    -------
+    None.
+    """
+    w1 = 2*np.pi*f1
+    w2 = 2*np.pi*f2
+    tiempo = np.linspace(0,t,t*fs)
+    R = np.log(w2/w1)
+    L = t/R
+    K = (t*w1)/R
 
-#     frec_inst = (K/L)*np.exp(tiempo/L)
-#     mod_m = w1/2*np.pi*(frec_inst)
+    frec_inst = (K/L)*np.exp(tiempo/L)
+    mod_m = w1/(2*np.pi*frec_inst)
     
-#     sine_sweep_t = np.sin(K*(np.exp(tiempo/L)-1))
+    sine_sweep_t = np.sin(K*(np.exp(tiempo/L)-1))
     
-#     sine_sweep_t_despl = np.sin(K*(np.exp(-tiempo/L)-1))
-#     filtro_inverso = mod_m*sine_sweep_t_despl
+    sine_sweep_t_despl = np.sin(K*(np.exp((-1)*tiempo/L)-1))
+    filtro_inverso = mod_m*sine_sweep_t_despl
     
-#     # Generación del archivo .wav
-#     sf.write('sine_sweep.wav', sine_sweep_t, 44100)
-#     sf.write('filtro_inverso.wav', filtro_inverso, 44100)
-#     return sine_sweep_t, filtro_inverso 
+    # Generación del archivo .wav
+    sf.write('sine_sweep.wav', sine_sweep_t, 44100)
+    sf.write('filtro_inverso.wav', filtro_inverso, 44100)
+    return sine_sweep_t, filtro_inverso 
 
-# sine_sweep = sine_sweep(10, 20, 20000, 44100)
+sine_sweep = sine_sweep(10, 20, 20000, 44100)
 
-# #Reproducción de los resultados 
+#Reproducción de los resultados 
 
-# sd.play(sine_sweep)
-# sd.wait()
+sd.play(sine_sweep)
+sd.wait()
 
-# # Segundo punto: Gráfico del espectro
+# Segundo punto: Gráfico del espectro
 
-# #Lee el archivo .txt
-# df = pd.read_csv(r'C:\Users\Tyler\Documents\UNTREF\Señales_y_sistemas\Práctica\TP\tp1-sys\Primera_entrega\espectro_sine_sweep.txt', delimiter="\t")
-# #Lo convierte a un array
-# array = df.to_numpy()
+#Lee el archivo .txt
+df = pd.read_csv(r'C:\Users\Tyler\Documents\UNTREF\Señales_y_sistemas\Práctica\TP\tp1-sys\Primera_entrega\espectro_sine_sweep.txt', delimiter="\t")
+#Lo convierte a un array
+array = df.to_numpy()
 
-# #Eje x: frecuencia
-# eje_x = array[:,0]
-# plt.xlabel("Frecuencia (Hz)")
+#Eje x: frecuencia
+eje_x = array[:,0]
+plt.xlabel("Frecuencia (Hz)")
 
-# #Eje y: amplitud
-# eje_y = array[0,:]
-# plt.ylabel("Amplitud (dB)")
+#Eje y: amplitud
+eje_y = array[0,:]
+plt.ylabel("Amplitud (dB)")
 
-# plt.title("Gráfico: Espectro de la señal")
-# plt.plot(eje_x, eje_y)
-# grafico = plt.show() 
-
-
-
+plt.title("Gráfico: Espectro de la señal")
+plt.plot(eje_x, eje_y)
+grafico = plt.show() 
 
 #-----------------------------------------------------------------------------
 

@@ -11,28 +11,28 @@ import soundfile as sf
 import sounddevice as sd
 import pandas as pd
 import scipy 
-# import matplotlib.pyplot as plt
+import matplotlib.pyplot as plt
 
 # # Primera consigna; Función de carga de archivos de audio
 
-# def carga(lista):
-#     '''
-#     Recibe como argumento una lista formada por strings que refieren a los 
-#     archivos de audio a ser cargados
+def carga(lista):
+    '''
+    Recibe como argumento una lista formada por strings que refieren a los 
+    archivos de audio a ser cargados
 
-#     Devuelve un diccionario cuyas claves son los nombres
-#     de los archivos y cuyos elementos son tuplas. En la primera posicion
-#     de cada tupla se encuentra el array de Numpy con el vector de audio y en la
-#     segunda posicion la frecuencia de muestreo del vector
-#     -------
-#     '''
-#     diccionario = {} 
-#     for i in lista:
-#         array = sf.read(i)
-#         diccionario[i]=array
-#     return diccionario
+    Devuelve un diccionario cuyas claves son los nombres
+    de los archivos y cuyos elementos son tuplas. En la primera posicion
+    de cada tupla se encuentra el array de Numpy con el vector de audio y en la
+    segunda posicion la frecuencia de muestreo del vector
+    -------
+    '''
+    diccionario = {} 
+    for i in lista:
+        array = sf.read(i)
+        diccionario[i]=array
+    return diccionario
     
-# dic = carga(['usina_main_s1_p5.wav', 'minster1_000_ortf_48k.wav'])
+dic = carga(['usina_main_s1_p5.wav', 'minster1_000_ortf_48k.wav'])
             
 
 #Segunda Consigna; Función de sintetización de respuesta al impulso
@@ -78,62 +78,59 @@ sd.play(sint)
 sd.wait()
 
     
-# # Tercera Consigna: Funcion de obtencion de la respuesta al impulso
+# Tercera Consigna: Funcion de obtencion de la respuesta al impulso
 
-# # -calculo la transformada del sweep grabado
-# # -calculo la transformada del filtro inverso
-# # -las multiplico y a ese producto le hago la transformada inversa
-# # -al resultado de todo esto le digo a soundfile que lo guarde en un wav
-# # -la funcion lo escupe como array de numpy
+def obtencion_RI(string1, string2):
+    """
+    Recibe como argumento dos strings, siendo el primero el nombre del 
+    archivo .wav con el sine sweep grabado en el recinto y el segundo el
+    nombre del archivo .wav del filtro inverso generado para ese sine sweep.
 
-# def obtencion_RI(string1, string2):
-#     """
-#     Recibe como argumento dos strings, siendo el primero el nombre del 
-#     archivo .wav con el sine sweep grabado en el recinto y el segundo el
-#     nombre del archivo .wav del filtro inverso generado para ese sine sweep.
+    Genera un archivo de audio.wav con la respuesta al impulso calculada 
+    a partir de la convolucion entre los dos archivos de audio 
+    y devuelve un numpy array con dicho vector de audio 
+    -------
 
-#     Genera un archivo de audio.wav con la respuesta al impulso calculada 
-#     a partir de la convolucion entre los dos archivos de audio 
-#     y devuelve un numpy array con dicho vector de audio 
-#     -------
-
-#     """
-#     sine_sweep, fs = sf.read(string1)
-#     fourier_ss = np.fft.fft(sine_sweep) 
-#     fourier_ss_inv = np.fft.ifft(fourier_ss)
+    """
+    sine_sweep, fs = sf.read(string1)
+    fourier_ss = np.fft.fft(sine_sweep) 
     
-#     filtro_inverso, fs = sf.read(string2)    
-#     fourier_fi = np.fft.fft(filtro_inverso) 
-#     fourier_fi_inv = np.fft.ifft(fourier_fi)
+    filtro_inverso, fs = sf.read(string2)    
+    fourier_fi = np.fft.fft(filtro_inverso) 
+
+    producto = fourier_ss * fourier_fi
+    resp_imp = abs(np.fft.ifft(producto))
     
-#     producto = fourier_ss_inv * fourier_fi_inv
-#     resp_imp = np.fft.ifft(producto)
+    sf.write('respuesta al impulso.wav', resp_imp, fs)
     
-#     sf.write('respuesta al impulso.wav', resp_imp, 44100)
+    return resp_imp
+
+#Nota: No pudimos hacer funcionar este código pero nos pareció importante adjuntarlo igual dado que sentimos que 
+#no estamos tan lejos de lograrlo.
+
+R_I_obtenido = obtencion_RI('sine_sweep.wav', 'filtro_inverso.wav')
+
+sd.play(R_I_obtenido)
+sd.wait()
+
+# Cuarta Consigna: Funcion filtros Norma IEC61260
+
+def filtrado(archivo, rango, orden):
+    """
+    Recibe como argumento tres parámetros: un string1 con el nombre del archivo
+    a filtrar, un string2 pudiendo ser 'o' para un filtrado por bandas de octava
+    o 't' para un filtrado por tercios de octava, y por último un int que indica
+    el orden del filtro.
+
+    Devuelve tres diccionarios, los tres tienen la misma información en las 
+    claves: las frecuencias centrales de las bandas que fueron filtradas. 
+    El primero tiene como valores, los arrays de la señal filtrada. 
+    El segundo tiene como valores la respuesta en frecuencia del filtro 
+    para cada frecuencia central correspondiente. 
+    El último tiene como valores los arrays con las frecuencias angulares
     
-#     return resp_imp
-
-# obtencion_RI('sine_sweep.wav', 'filtro_inverso.wav')
-
-
-# # Cuarta Consigna: Funcion filtros Norma IEC61260
-
-# def filtrado(archivo, rango, orden):
-#     """
-#     Recibe como argumento tres parámetros: un string1 con el nombre del archivo
-#     a filtrar, un string2 pudiendo ser 'o' para un filtrado por bandas de octava
-#     o 't' para un filtrado por tercios de octava, y por último un int que indica
-#     el orden del filtro.
-
-#     Devuelve tres diccionarios, los tres tienen la misma información en las 
-#     claves: las frecuencias centrales de las bandas que fueron filtradas. 
-#     El primero tiene como valores, los arrays de la señal filtrada. 
-#     El segundo tiene como valores la respuesta en frecuencia del filtro 
-#     para cada frecuencia central correspondiente. 
-#     El último tiene como valores los arrays con las frecuencias angulares
-    
-#     """
-#     archivo = sf.read(string)
+    """
+# no se nos ocurrió cómo interpretar esta consigna 
     
 
 # Quinta Consigna: Funcion conversion a escala logaritmica normalizada
