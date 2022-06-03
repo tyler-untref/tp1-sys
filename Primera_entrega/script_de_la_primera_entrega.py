@@ -11,6 +11,7 @@ import soundfile as sf
 import sounddevice as sd
 import pandas as pd
 import matplotlib.pyplot as plt
+from scipy import signal
 
 # Primera consigna: Función de sintetización de ruido rosa
 
@@ -79,61 +80,39 @@ ruido_rosa = ruidoRosa_voss(10,44100,16)
 
 # Segundo punto: gráfico del dominio temporal
 
-def dominio_temporal(t,fs):
+def dominio_temporal(archivo):
     """
-    Genera un array de t segundos con n = t*fs muestras y plotea 
-    la amplitud de la función ruido rosa dependiente del tiempo 
+    Grafica una señal de entrada en función del tiempo. 
     
+    Parametro
+    ----------
+    archivo: Numpy array de 1D
+             
     """
+    
+    archivo, fs = archivo
     #Eje x: tiempo
-    eje_x = np.linspace(0,t,t*fs)
+    eje_x = np.linspace(0,(len(archivo)/fs),len(archivo))
     plt.xlabel("Tiempo (s)")
     
     #Eje y: amplitud normalizada
-    eje_y = ruido_rosa
+    eje_y = archivo
     plt.ylabel("Amplitud Normalizada")
     
-    plt.title("Gráfico: dominio temporal de la señal")
+    plt.title("Gráfico: Dominio temporal de la señal")
     plt.plot(eje_x, eje_y)
-    return plt.show()
-
-dominio_temporal(10,44100)
-
-# Tercer punto: gráfico del domino espectral
-
-#Lee el archivo .txt
-df = pd.read_csv(r'C:\Users\Tyler\Documents\UNTREF\Señales_y_sistemas\Práctica\TP\tp1-sys\Primera_entrega\espectro-ruido_rosa.txt', delimiter="\t")
-#Lo convierte a un array
-array = df.to_numpy()
-
-#Eje x: frecuencia
-eje_x = array[:,0]
-plt.xlabel("Frecuencia (Hz)")
-
-#Eje y: amplitud
-eje_y = array[0,:]
-plt.ylabel("Amplitud (dB)")
-
-plt.title("Gráfico: Espectro de la señal")
-plt.plot(eje_x, eje_y)
-grafico = plt.show() 
-
-#El problema es que las dimensiones tienen que ser iguales
+    return plt.show()  
 
 
-
-sd.play(ruido_rosa,44100)
-sd.wait()
+# sd.play(ruido_rosa,44100)
+# sd.wait()
 
 
 #-----------------------------------------------------------------------------
 
-# Segunda consigna: Funcion de generación de sine sweep logaritmico + filtro inverso
+#Segunda consigna: Funcion de generación de sine sweep logaritmico + filtro inverso
 
-# Primer punto: definición de la función
-
-def sine_sweep(t, f1, f2, fs):
-    
+def gen_sine_sweep(t, f1, f2, fs):
     """
     Genera un Sine Sweep utilizando las ecuaciones de Meng, Q. y su filtro
     inverso. 
@@ -147,12 +126,13 @@ def sine_sweep(t, f1, f2, fs):
     f2 : int
         Frecuencia superior en Hz.
     fs : int
-        Frecuencia de muestreo en Hz de la señal. Por defecto el valor es 44100 Hz.    
+        Frecuencia de muestreo en Hz de la señal.      
 
-    Returns: 2 NumPy array
-        Datos de la señal generada.
+    Returns: Tupla de dos elementos, con 1 Numpy array en cada elemento.
+        El primer elemento corresponde al array del sine sweep y el segundo
+        elemento corresponde al filtro inverso.
     -------
-    None.
+    
     """
     w1 = 2*np.pi*f1
     w2 = 2*np.pi*f2
@@ -166,60 +146,114 @@ def sine_sweep(t, f1, f2, fs):
     
     sine_sweep_t = np.sin(K*(np.exp(tiempo/L)-1))
     
-    sine_sweep_t_despl = np.sin(K*(np.exp((-1)*tiempo/L)-1))
-    filtro_inverso = mod_m*sine_sweep_t_despl
+    filtro_inverso = mod_m*sine_sweep_t[::-1]
     
     # Generación del archivo .wav
-    sf.write('sine_sweep.wav', sine_sweep_t, 44100)
-    sf.write('filtro_inverso.wav', filtro_inverso, 44100)
+    sf.write('sine_sweep.wav', sine_sweep_t, fs)
+    sf.write('filtro_inverso.wav', filtro_inverso, fs)
     return sine_sweep_t, filtro_inverso 
 
-sine_sweep = sine_sweep(10, 20, 20000, 44100)
+t =10
+sine_sweep = gen_sine_sweep(t, 20, 20000, 48000)
 
 #Reproducción de los resultados 
 
-sd.play(sine_sweep)
-sd.wait()
+# sd.play(sine_sweep[0])
+# sd.wait()
 
-# Segundo punto: Gráfico del espectro
+# #generacion de filtro inverso del sine_sweep_grabado aula de informatica
+# grabado, fs = sf.read('ss-grabado.wav')
+# grabado = grabado[(fs):(31*fs)]
+# w1 = 2*np.pi*88
+# w2 = 2*np.pi*11314
+# tiempo = np.linspace(0,len(grabado)/fs,len(grabado))
+# R = np.log(w2/w1)
+# L = t/R
+# K = (t*w1)/R
 
-#Lee el archivo .txt
-df = pd.read_csv(r'C:\Users\Tyler\Documents\UNTREF\Señales_y_sistemas\Práctica\TP\tp1-sys\Primera_entrega\espectro_sine_sweep.txt', delimiter="\t")
-#Lo convierte a un array
-array = df.to_numpy()
+# frec_inst = (K/L)*np.exp(tiempo/L)
+# mod_m = w1/(2*np.pi*frec_inst)
+# filtro_inverso = mod_m*((-1)*grabado)
+    
+# # Generación del archivo .wav
+# sf.write('filtro_inverso.wav', filtro_inverso, 44100)
+
+
+
+##Grafico del sine sweep generado
 
 #Eje x: frecuencia
-eje_x = array[:,0]
-plt.xlabel("Frecuencia (Hz)")
+eje_x_ss = np.linspace(0,t,t*48000)
 
 #Eje y: amplitud
-eje_y = array[0,:]
+eje_y_ss = sine_sweep[0]
+
+plt.figure(1)
+plt.plot(eje_x_ss, eje_y_ss,'r')
+plt.xlabel("Tiempo (t)")
 plt.ylabel("Amplitud (dB)")
+plt.title("esto es del sine sweep")
 
-plt.title("Gráfico: Espectro de la señal")
-plt.plot(eje_x, eje_y)
-grafico = plt.show() 
 
+##Grafico del filtro inverso
+
+#Eje x: frecuencia
+eje_x_fi = np.linspace(0,t,t*48000)
+
+#Eje y: amplitud
+eje_y_fi = sine_sweep[1]
+
+plt.figure(2)
+plt.plot(eje_x_fi, eje_y_fi)
+plt.xlabel("Tiempo (t)")
+plt.ylabel("Amplitud (dB)")
+plt.title("esto es del filtro inverso")
+
+
+## test con la convolucion:
+    
+convolucion = signal.convolve(sine_sweep[0], sine_sweep[1])
+sf.write('convolucion.wav', convolucion, 48000)
+#sd.play(convolucion)
+
+#Grafico de la convolucion
+#Eje x: frecuencia
+eje_x_c = np.linspace(0,(len(convolucion)/48000),len(convolucion))
+
+#Eje y: amplitud
+eje_y_c = convolucion
+
+plt.figure(3)
+plt.plot(eje_x_c, eje_y_c,'g')
+plt.xlabel("Tiempo (t)")
+plt.ylabel("Amplitud (dB)")
+plt.title("esto es de la convolucion")
+
+
+    
+    
 #-----------------------------------------------------------------------------
 
 # Tercera Consigna: Funcion de adquisicion y reproduccion
 
-def adquisicion_reproduccion(archivo,t):
+# def adquisicion_reproduccion(archivo,t):
     
-    """
-    Recibe como argumento un string con el nombre de archivo de audio a ser 
-    reproducido y un int el cual refiere al tiempo de duracion de la 
-    reproducción del archivo. 
+#     """
+#     Recibe como argumento un string con el nombre de archivo de audio a ser 
+#     reproducido y un int el cual refiere al tiempo de duracion de la 
+#         reproducción del archivo. 
     
-    Devuelve una reproducción de audio utiizando sd.read
+#     Devuelve una reproducción de audio utiizando sd.read
     
-    """
+#     """
     
-    (archivo, fs) = sf.read(archivo)
-    archivo = archivo[0:((t*fs)+1)]
-    return sd.play(archivo)
+#     (archivo, fs) = sf.read(archivo)
+#     archivo = archivo[0:((t*fs)+1)]
+#     return sd.play(archivo)
 
-prueba = adquisicion_reproduccion('miles.wav', 5)
+# prueba = adquisicion_reproduccion('miles.wav', 5)
+
+
 
 
 
