@@ -13,6 +13,37 @@ import pandas as pd
 from scipy import signal
 import matplotlib.pyplot as plt
 
+
+
+#traigo la funcion dominio_temporal de la primer entrega:
+    
+def dominio_temporal(data):
+    """
+    Grafica una señal de entrada en función del tiempo. 
+    
+    Parametro
+    ----------
+    data: tupla. 
+         El primer valor es un numpy array de 1D y el segundo es su fs.
+             
+    """
+    archivo = data[0]
+    fs = data[1]
+    
+    #Eje x: tiempo
+    eje_x = np.linspace(0,(len(archivo)/fs),len(archivo))
+    plt.xlabel("Tiempo (s)")
+    
+    #Eje y: amplitud normalizada
+    eje_y = archivo
+    plt.ylabel("Amplitud Normalizada")
+    
+    plt.title("Gráfico: Dominio temporal de la señal")
+    plt.plot(eje_x, eje_y)
+    return plt.show()      
+
+
+
 # Primera consigna; Función de carga de archivos de audio
 
 # def carga(lista):
@@ -38,39 +69,11 @@ import matplotlib.pyplot as plt
 # dic = carga(['usina_main_s1_p5.wav', 'minster1_000_ortf_48k.wav'])
             
 
-#traigo la funcion dominio_temporal de la primer entrega:
-
-    
-def dominio_temporal(data):
-    """
-    Grafica una señal de entrada en función del tiempo. 
-    
-    Parametro
-    ----------
-    archivo: tupla con valores de un diccionario. El primer valor es un numpy
-    array de 1D y el segundo es su fs
-             
-    """
-    archivo = data[0]
-    fs = data[1]
-    
-    #Eje x: tiempo
-    eje_x = np.linspace(0,(len(archivo)/fs),len(archivo))
-    plt.xlabel("Tiempo (s)")
-    
-    #Eje y: amplitud normalizada
-    eje_y = archivo
-    plt.ylabel("Amplitud Normalizada")
-    
-    plt.title("Gráfico: Dominio temporal de la señal")
-    plt.plot(eje_x, eje_y)
-    return plt.show()      
-
-
 # #grafico de la primer señal del diccionario
 # tupla1 = dic.get('usina_main_s1_p5.wav')
 
 # dic_plot = dominio_temporal(tupla1)
+
 
 
 #Segunda Consigna: Función de sintetización de respuesta al impulso
@@ -220,7 +223,7 @@ def filtrado(archivo, rango, orden):
     print('Frecuencia de corte superior: ', round(f2_Hz), 'Hz')
     
     #Extraemos los coeficientes del filtro 
-    b,a = signal.iirfilter(4, [2*np.pi*f1_Hz,2*np.pi*f2_Hz], rs=60, btype='band', 
+    b,a = signal.iirfilter(orden, [2*np.pi*f1_Hz,2*np.pi*f2_Hz], rs=60, btype='band', 
                            analog=True, ftype='butter') 
     
     #Defino sos para aplicar el filtro 
@@ -268,9 +271,11 @@ plt.ylabel('Amplitude response [dB]')
 plt.grid()
 plt.show() 
 
-#suena la cancion filtrada   
-sd.play(array_filtrado_dic_filt)
+#suena la señal filtrada   
+#sd.play(array_filtrado_dic_filt)
 
+#me guardo la señal filtrada
+sf.write('miles_filtrado.wav', array_filtrado_dic_filt, 48000)
 
 # Quinta Consigna: Funcion conversion a escala logaritmica normalizada
 
