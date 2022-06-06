@@ -13,10 +13,7 @@ import pandas as pd
 from scipy import signal
 import matplotlib.pyplot as plt
 
-
-
-#traigo la funcion dominio_temporal de la primer entrega:
-    
+#traigo la funcion dominio_temporal de la primer entrega:    
 def dominio_temporal(data):
     """
     Grafica una señal de entrada en función del tiempo. 
@@ -24,7 +21,7 @@ def dominio_temporal(data):
     Parametro
     ----------
     data: tupla. 
-         El primer valor es un numpy array de 1D y el segundo es su fs.
+      El primer valor es un numpy array de 1D y el segundo es su fs.
              
     """
     archivo = data[0]
@@ -38,67 +35,70 @@ def dominio_temporal(data):
     eje_y = archivo
     plt.ylabel("Amplitud Normalizada")
     
-    plt.title("Gráfico: Dominio temporal de la señal")
     plt.plot(eje_x, eje_y)
-    return plt.show()      
+           
 
-
-
-# Primera consigna; Función de carga de archivos de audio
-
-# def carga(lista):
-#     '''
-#     Recibe archivos de audio y los guarda en un diccionario.
-#     Parametros
-#     ----------
-#     lista: lista formada por strings que refieren a los archivos de audio 
-#     a ser cargados
-
-#     returns: un diccionario cuyas claves son los nombres
-#     de los archivos y cuyos valores son tuplas. En la primera posicion
-#     de cada tupla se encuentra el array de Numpy con el vector de audio y en la
-#     segunda posicion la frecuencia de muestreo del vector
-#     -------
-#     '''
-#     diccionario = {} 
-#     for i in lista:
-#         array, fs = sf.read(i)
-#         diccionario[i]=(array, fs)
-#     return diccionario
+#Primera consigna: Función de carga de archivos de audio
+def carga(lista):
+    '''
+    Recibe archivos de audio y los guarda en un diccionario.
     
-# dic = carga(['usina_main_s1_p5.wav', 'minster1_000_ortf_48k.wav'])
+    Parametros
+    ----------
+    lista: lista 
+       formada por strings que refieren a los archivos de audio .wav
+       a ser cargados.
+
+    Returns
+    -------
+    diccionario : diccionario 
+         un diccionario cuyas claves son los nombres de los archivos 
+         .wav y cuyos valores son tuplas. 
+         En la primera posicion de cada tupla se encuentra el array 
+         de Numpy con el vector de audio y en la segunda posición la
+         frecuencia de muestreo de array.
+    '''
+    diccionario = {} 
+    for i in lista:
+        array, fs = sf.read(i)
+        diccionario[i]=(array, fs)
+    return diccionario
+    
+dic = carga(['usina_main_s1_p5.wav', 'minster1_000_ortf_48k.wav'])
             
 
-# #grafico de la primer señal del diccionario
-# tupla1 = dic.get('usina_main_s1_p5.wav')
-
-# dic_plot = dominio_temporal(tupla1)
-
-
-
 #Segunda Consigna: Función de sintetización de respuesta al impulso
+def sintetizacion_R_I(diccionario):
+    '''
+    Genera una respuesta al impulso sintetizada a partir de valores previamente
+    definidos de T_60.
+    
+    .Nota: La función escribe un archivo.wav llamado ´sintetizacion RI.wav´.
 
+    Parametros
+    ----------
+    diccionario : diccionario
+         un diccionario cuyas claves son las frecuencias centrales 
+         y sus valores son los T60 correspondientes a cada frecuencia
+         central de banda de octava como establece la norma IEC61260 
+         (IEC61260,1995).
 
-def sintetizacion_R_I(vector):
-    """
-    Recibe como argumento un diccionario cuyas claves son las frecuencias 
-    centrales y sus elementos son los T60 correspondientes a cada frecuencia 
-    central de banda de octava como establece la norma IEC61260 (IEC61260,1995).
-
-    La funcion escribe un archivo.wav llamado ´sintetizacion RI.wav´
-    y devuelve un array con la respuesta al impulso sintetizada de valores de 
-    T60 definidos para cada frecuencia central y de duracion t segundos. 
+    Returns
     -------
-    """
+    suma : Numpy Array
+       con la respuesta al impulso sintetizada de valores de T60 definidos 
+       para cada frecuencia central y con duracion de t segundos.
+    
+    '''
     t = 3
     fs = 44100
     suma = np.zeros(t*fs)
-    lista_f = list(vector)
+    lista_f = list(diccionario)
     # print(lista_f)
-    lista_t60 = list(vector.values())
+    lista_t60 = list(diccionario.values())
     # print(lista_t60)
     tiempo = np.linspace(0, t, t*fs)
-    for i in range(len(vector)):
+    for i in range(len(diccionario)):
         f_i = lista_f[i]
         t60i = lista_t60[i]
         tau_i = ((-1)*np.log(10**(-3)))/t60i
@@ -112,109 +112,116 @@ def sintetizacion_R_I(vector):
     sf.write('sintetizacion RI.wav', suma, fs)
     return suma
 
+
 dic_t60 = {31.25: 2.15, 62.5: 1.48, 125: 1.63, 250: 1.91, 500: 2.08, 1000: 2.09, 
             2000: 1.82, 4000: 1.6, 8000: 1.18, 16000: 1.11}
 
 sint = sintetizacion_R_I(dic_t60)
 
-# sd.play(sint)
-# sd.wait()
-
     
-#Tercera Consigna: Funcion de obtencion de la respuesta al impulso
-
-# def obtencion_RI(ss_grabado, wav_f_i):
-#     """
-#     Recibe como argumento dos strings, siendo el primero el nombre del 
-#     archivo .wav con el sine sweep grabado en el recinto y el segundo el
-#     nombre del archivo .wav del filtro inverso generado para ese sine sweep.
-
-#     Genera un archivo de audio.wav con la respuesta al impulso calculada 
-#     a partir de la convolucion entre los dos archivos de audio 
-#     y devuelve un numpy array con dicho vector de audio 
-#     -------
-
-#     """
-#     sine_sweep, fs = sf.read(ss_grabado)
+# Tercera Consigna: Funcion de obtencion de la respuesta al impulso
+def obtencion_RI(ss_grabado, wav_f_i):
+    '''
+    Calcula la respuesta al impulso a partir de la convolución entre el sine 
+    sweep grabado en el recinto y el filtro inverso ya generado para ese sine
+    sweep.
     
-#     filtro_inverso, fs = sf.read(wav_f_i)    
+    .Nota: La función genera un archivo de audio .wav con la respuesta al 
+    impulso llamado 'respuesta al impulso.wav' 
+
+    Parametros
+    ----------
+    ss_grabado : string
+        nombre del archivo .wav con el sine sweep grabado en el recinto.
+    wav_f_i : string
+        nombre del archivo .wav del filtro inverso generado para ese sine sweep.
+
+    Returns
+    -------
+    resp_imp : Numpy Array
+        con la respuesta al impulso calculada.
+
+    '''
+    sine_sweep, fs = sf.read(ss_grabado)
     
-#     resp_imp = signal.fftconvolve(sine_sweep, filtro_inverso) 
+    filtro_inverso, fs = sf.read(wav_f_i)    
     
-#     sf.write('respuesta al impulso.wav', resp_imp, fs)
+    resp_imp = signal.fftconvolve(sine_sweep, filtro_inverso) 
     
-#     return resp_imp
-
-
-# grabado, fs = sf.read('ss-grabado.wav')
-# grabado_cortado = grabado[(fs):(31*fs)]
-# # sd.play(grabado_cortado)
-
-# sf.write('grabado_cortado.wav', grabado_cortado, 44100)
-
-# #generacion de filtro inverso del sine_sweep_grabado aula de informatica
-# grabado, fs = sf.read('ss-grabado.wav')
-# grabado = grabado[(fs):(31*fs)]
-# t =10
-# w1 = 2*np.pi*88
-# w2 = 2*np.pi*11314
-# tiempo = np.linspace(0,len(grabado)/fs,len(grabado))
-# R = np.log(w2/w1)
-# L = t/R
-# K = (t*w1)/R
-
-# frec_inst = (K/L)*np.exp(tiempo/L)
-# mod_m = w1/(2*np.pi*frec_inst)
-# filtro_inverso = mod_m*((-1)*grabado)
+    sf.write('respuesta al impulso.wav', resp_imp, fs)
     
-# # Generación del archivo .wav
-# sf.write('filtro_inverso.wav', filtro_inverso, fs)
+    return resp_imp
 
-# R_I_obtenido = obtencion_RI('grabado_cortado.wav', 'filtro_inverso.wav')
 
-# # sd.play(R_I_obtenido)
-# # sd.wait()
+grabado, fs = sf.read('ss-grabado.wav')
+grabado_cortado = grabado[(fs):(31*fs)]
 
+sf.write('grabado_cortado.wav', grabado_cortado, 44100)
+
+#generacion de filtro inverso del sine_sweep_grabado aula de informatica
+grabado, fs = sf.read('ss-grabado.wav')
+grabado = grabado[(fs):(31*fs)]
+t =10
+w1 = 2*np.pi*88
+w2 = 2*np.pi*11314
+tiempo = np.linspace(0,len(grabado)/fs,len(grabado))
+R = np.log(w2/w1)
+L = t/R
+K = (t*w1)/R
+
+frec_inst = (K/L)*np.exp(tiempo/L)
+mod_m = w1/(2*np.pi*frec_inst)
+filtro_inverso = mod_m*((-1)*grabado)
+    
+# Generación del archivo .wav
+sf.write('filtro_inverso.wav', filtro_inverso, fs)
+
+R_I_obtenido = obtencion_RI('grabado_cortado.wav', 'filtro_inverso.wav')
 
 
 # Cuarta Consigna: Funcion filtros Norma IEC61260
 
-def filtrado(archivo, rango, orden):
+def filtrado(archivo, rango, fc, orden):
     """
+    Aplica un filtro pasabanda a la señal de entrada, por octavas o por tercios 
+    de octava según la norma IEC61260.
     
     Parametros
     ----------
     archivo: string
-             nombre del archivo .wav a filtrar.
+       nombre del archivo .wav a filtrar.
     rango: string
-           pudiendo ser 'o' para un filtrado por bandas de octava
-           o 't' para un filtrado por tercios de octava.
+       pudiendo ser 'o' para un filtrado por bandas de octava
+       o 't' para un filtrado por tercios de octava.
+    fc: int
+     frecuencia central en Hz.
     orden: int
-           orden del filtro.
+       orden del filtro.
         
-    returns: lista 
-             -el primer elemento es la frecuencia central fc de la banda que 
-              fue filtrada 
-             -el segundo elemento es array de la señal filtrada para esa fc.
-             -el tercer elemento es la respuesta en frecuencia del filtro 
-              para esa fc.
-             -el cuarto elemento es un array con las frecuencias angulares.
-              
-              
+    Returns:
     -------
+    lista: lista
+      -el primer elemento es la frecuencia central fc de la banda que 
+       fue filtrada 
+      -el segundo elemento es array de la señal filtrada para esa fc.
+      -el tercer elemento es la respuesta en frecuencia del filtro 
+       para esa fc.
+      -el cuarto elemento es un array con las frecuencias angulares.
+      
     """
     archivo, fs = sf.read(archivo) 
+    
     #Octava: G = 1/2, 
     #1/3 de Octava: G = 1/6
     if rango == 'o':
         G = 1/2
-    if rango == 't':
-        G = 1/6
-    else:
-        print('decida si quiere filtrado por octava o por tercios de octava')
+        if rango == 't':
+            G = 1/6
+        else:
+            print('decida si quiere un filtrado por octava o por tercios de octava')
     
     factor = np.power(2, G)
-    fc_Hz = 150
+    fc_Hz = fc
     
     #Calculo los extremos de la banda a partir de la frecuencia central
     f1_Hz=fc_Hz/factor
@@ -230,71 +237,71 @@ def filtrado(archivo, rango, orden):
     sos = signal.iirfilter(orden, [f1_Hz,f2_Hz], rs=60, btype='band', analog=False, 
                            ftype='butter', fs=fs, output='sos')
     
-    #Dados los coeficientes del filtro, calculo la resp en frecuencia
     
+    #Dados los coeficientes del filtro, calculo la resp en frecuencia
     #w: array con las frecuencias angulares con las que h fue calculado.
     #h: array con la respuesta en frecuencia.
     w, h = signal.freqs(b,a)
     
     #Aplico el filtro al audio
-    # aplicando filtro al audio
     filt = signal.sosfilt(sos, archivo)
     
     #defino las salidas
-    # dic_1 = {str(fc_Hz): filt, str(fc_Hz): h, str(fc_Hz): w}
     lista = [fc_Hz, filt, h, w]
     return lista
 
 
-filtrado_dic = filtrado('miles_mono.wav', 'o', 3)
-array_filtrado_dic_filt = filtrado_dic[1]
-array_filtrado_dic_h = filtrado_dic[2]
-array_filtrado_w = filtrado_dic[3]
+# #prueba
+# filtrado_dic = filtrado('miles_mono.wav', 'o', 3)
+# array_filtrado_dic_filt = filtrado_dic[1]
+# array_filtrado_dic_h = filtrado_dic[2]
+# array_filtrado_w = filtrado_dic[3]
 
-print(array_filtrado_dic_filt)
-print('pausa')
-print(array_filtrado_dic_h)
-print('pausa')
-print(array_filtrado_w)
+# print(array_filtrado_dic_filt)
+# print('pausa')
+# print(array_filtrado_dic_h)
+# print('pausa')
+# print(array_filtrado_w)
 
-# miles, fs = sf.read('miles.wav')
-# miles = miles[:,0]
-# sf.write('miles_mono.wav', miles, fs)
 
-#grafico temporal de la señal filtrada
-dominio_temporal((array_filtrado_dic_filt, 44100))
+# #grafico temporal de la señal filtrada
+# dominio_temporal((array_filtrado_dic_filt, 44100))
 
-#espectro de la respuesta del filtro (no termino de ver si está bien o no)
-plt.semilogx(array_filtrado_w, 20*np.log10(abs(array_filtrado_dic_h)))
-plt.xlabel('Frequency')
-plt.ylabel('Amplitude response [dB]')
-plt.grid()
-plt.show() 
-
-#suena la señal filtrada   
-#sd.play(array_filtrado_dic_filt)
+# #espectro de la respuesta del filtro (no termino de ver si está bien o no)
+# plt.semilogx(array_filtrado_w, 20*np.log10(abs(array_filtrado_dic_h)))
+# plt.xlabel('Frecuencia')
+# plt.ylabel('Amplitud [dB]')
+# plt.grid()
+# plt.show() 
 
 #me guardo la señal filtrada
-sf.write('miles_filtrado.wav', array_filtrado_dic_filt, 48000)
+#sf.write('miles_filtrado.wav', array_filtrado_dic_filt, 48000)
+
+
 
 #Quinta Consigna: Funcion conversion a escala logaritmica normalizada
-
 def conversion_log_norm(RI):
-    """
-    Recibe como argumento un array (la respuesta al impulso con escala lineal)
+    '''
+    Convierte una señal de entrada lineal en una señal con escala logaritmica
+    normalizada.
     
-    Devuelve el mismo array pero convertido a escala logaritmica
-    """
+    Parametros
+    ----------
+    RI : Numpy Array
+        respuesta al impulso con escala lineal.
+
+    Returns
+    -------
+    RI_log : Numpy Array
+        respuesta al impulso con escala logaritmica normalizada.
+
+    '''
     RI_max = max(np.abs(RI))
     RI_log = 20*np.log10(RI/(RI_max))
     return RI_log
 
 sint_log_norm = conversion_log_norm(sint)
 
-plt.figure(1)
-grafico_lineal = dominio_temporal((sint, 44100))
 
-plt.figure(2)
-grafico_log = dominio_temporal((sint_log_norm, 44100))
 
 

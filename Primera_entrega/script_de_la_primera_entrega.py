@@ -12,7 +12,7 @@ import sounddevice as sd
 import pandas as pd
 import matplotlib.pyplot as plt
 from scipy import signal
-
+import scipy.io.wavfile as sio
 # Primera consigna: Función de sintetización de ruido rosa
 
 # Primer punto: definición de la función
@@ -21,7 +21,7 @@ def ruidoRosa_voss(t,fs,ncols):
     """
     Genera ruido rosa utilizando el algoritmo de Voss-McCartney(https://www.dsprelated.com/showabstract/3933.php).
     
-    .. Nota:: si 'ruidoRosa.wav' existe, este será sobreescrito
+    .Nota: si 'ruidoRosa.wav' existe, este será sobreescrito.
     
     Parametros
     ----------
@@ -35,16 +35,6 @@ def ruidoRosa_voss(t,fs,ncols):
     returns: NumPy array
         Datos de la señal generada.
     
-    Ejemplo
-    -------
-    Generar un `.wav` desde un numpy array de 10 segundos con ruido rosa a una 
-    frecuencia de muestreo de 44100 Hz.
-    
-        import numpy as np
-        import soundfile as sf
-        from scipy import signal
-        
-        ruidoRosa_voss(10)
     """
 
     nrows = int(float(t)*fs)
@@ -78,34 +68,32 @@ def ruidoRosa_voss(t,fs,ncols):
 
 ruido_rosa = ruidoRosa_voss(10,44100,16)
 
-# Segundo punto: gráfico del dominio temporal
 
-def dominio_temporal(archivo):
+# Segundo punto: funcion gráfico del dominio temporal
+def dominio_temporal(data):
     """
     Grafica una señal de entrada en función del tiempo. 
     
     Parametro
     ----------
-    archivo: Numpy array de 1D
+    data: tupla. 
+          El primer valor es un numpy array de 1D y el segundo es su fs.
              
     """
+    archivo = data[0]
+    fs = data[1]
     
-    archivo, fs = archivo
     #Eje x: tiempo
     eje_x = np.linspace(0,(len(archivo)/fs),len(archivo))
     plt.xlabel("Tiempo (s)")
     
     #Eje y: amplitud normalizada
     eje_y = archivo
-    plt.ylabel("Amplitud Normalizada")
+    plt.ylabel("Amplitud normalizada")
+    # plt.yscale('log')
     
-    plt.title("Gráfico: Dominio temporal de la señal")
     plt.plot(eje_x, eje_y)
-    return plt.show()  
-
-
-# sd.play(ruido_rosa,44100)
-# sd.wait()
+    plt.show()      
 
 
 #-----------------------------------------------------------------------------
@@ -129,8 +117,8 @@ def gen_sine_sweep(t, f1, f2, fs):
         Frecuencia de muestreo en Hz de la señal.      
 
     Returns: Tupla de dos elementos, con 1 Numpy array en cada elemento.
-        El primer elemento corresponde al array del sine sweep y el segundo
-        elemento corresponde al filtro inverso.
+        El primer elemento corresponde al array del sine sweep generado y el 
+        segundo elemento corresponde al filtro inverso del sine sweep generado.
     -------
     
     """
@@ -144,24 +132,29 @@ def gen_sine_sweep(t, f1, f2, fs):
     frec_inst = (K/L)*np.exp(tiempo/L)
     mod_m = w1/(2*np.pi*frec_inst)
     
-    sine_sweep_t = np.sin(K*(np.exp(tiempo/L)-1))
+    sine_sweep_t = np.sin(K*(np.exp(tiempo/L) - 1))
     
-    filtro_inverso = mod_m*sine_sweep_t[::-1]
+    filtro_inverso = mod_m * sine_sweep_t[::-1]
+    filtro_inverso = filtro_inverso/max(filtro_inverso)
     
     # Generación del archivo .wav
     sf.write('sine_sweep.wav', sine_sweep_t, fs)
     sf.write('filtro_inverso.wav', filtro_inverso, fs)
+    
     return sine_sweep_t, filtro_inverso 
 
 t =10
 sine_sweep = gen_sine_sweep(t, 20, 20000, 48000)
 
-#Reproducción de los resultados 
 
-# sd.play(sine_sweep[0])
-# sd.wait()
+## test con la convolucion:    
+convolucion = signal.convolve(sine_sweep[0], sine_sweep[1])
+sf.write('convolucion.wav', convolucion, 48000)
 
-# #generacion de filtro inverso del sine_sweep_grabado aula de informatica
+
+
+# #Generacion de filtro inverso del sine_sweep_grabado aula de informatica
+
 # grabado, fs = sf.read('ss-grabado.wav')
 # grabado = grabado[(fs):(31*fs)]
 # w1 = 2*np.pi*88
@@ -179,81 +172,41 @@ sine_sweep = gen_sine_sweep(t, 20, 20000, 48000)
 # sf.write('filtro_inverso.wav', filtro_inverso, 44100)
 
 
-
-##Grafico del sine sweep generado
-
-#Eje x: frecuencia
-eje_x_ss = np.linspace(0,t,t*48000)
-
-#Eje y: amplitud
-eje_y_ss = sine_sweep[0]
-
-plt.figure(1)
-plt.plot(eje_x_ss, eje_y_ss,'r')
-plt.xlabel("Tiempo (t)")
-plt.ylabel("Amplitud (dB)")
-plt.title("esto es del sine sweep")
-
-
-##Grafico del filtro inverso
-
-#Eje x: frecuencia
-eje_x_fi = np.linspace(0,t,t*48000)
-
-#Eje y: amplitud
-eje_y_fi = sine_sweep[1]
-
-plt.figure(2)
-plt.plot(eje_x_fi, eje_y_fi)
-plt.xlabel("Tiempo (t)")
-plt.ylabel("Amplitud (dB)")
-plt.title("esto es del filtro inverso")
-
-
-## test con la convolucion:
-    
-convolucion = signal.convolve(sine_sweep[0], sine_sweep[1])
-sf.write('convolucion.wav', convolucion, 48000)
-#sd.play(convolucion)
-
-#Grafico de la convolucion
-#Eje x: frecuencia
-eje_x_c = np.linspace(0,(len(convolucion)/48000),len(convolucion))
-
-#Eje y: amplitud
-eje_y_c = convolucion
-
-plt.figure(3)
-plt.plot(eje_x_c, eje_y_c,'g')
-plt.xlabel("Tiempo (t)")
-plt.ylabel("Amplitud (dB)")
-plt.title("esto es de la convolucion")
-
-
-    
-    
 #-----------------------------------------------------------------------------
 
-# Tercera Consigna: Funcion de adquisicion y reproduccion
 
-# def adquisicion_reproduccion(archivo,t):
+#Funcion de reproducción y adquisición
+def reproduccion_adquisicion(archivo):
+    '''
+    Reproduce la señal de audio utilizando la salida física de audio 
+    (seleccionada por default) y graba la reproducción de la misma, utilizando 
+    la entrada física (seleccionada por default) de audio de la computadora.
     
-#     """
-#     Recibe como argumento un string con el nombre de archivo de audio a ser 
-#     reproducido y un int el cual refiere al tiempo de duracion de la 
-#         reproducción del archivo. 
+    .Nota: La función escribe un archivo.wav llamado 'sine_sweep_generado_y_
+    reproducido.wav'
     
-#     Devuelve una reproducción de audio utiizando sd.read
-    
-#     """
-    
-#     (archivo, fs) = sf.read(archivo)
-#     archivo = archivo[0:((t*fs)+1)]
-#     return sd.play(archivo)
+    Parámetro
+    ----------
+    archivo : string
+        nombre del archvio .wav a ser reproducido.
 
-# prueba = adquisicion_reproduccion('miles.wav', 5)
+    Returns
+    -------
+    grabacion : Numpy Array
+        devuelve un vector con la señal grabada.
+
+    '''
+    #, entrada='digital input', salida='digital output', lat_entrada='high', lat_salida='high')
+                              
+                             
+    vector, fs = sf.read(archivo)
+    # sd.default.device = (entrada, salida)
+    # sd.default.latency = (lat_entrada, lat_salida)
+    grabacion = sd.playrec(vector, fs, channels=2)
+    sio.write('sine_sweep_generado_y_reproducido.wav', fs, grabacion)
+    return grabacion
 
 
-
+audio = reproduccion_adquisicion('sine_sweep.wav')
 
 
