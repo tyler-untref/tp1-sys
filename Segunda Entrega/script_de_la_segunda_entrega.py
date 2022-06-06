@@ -277,24 +277,24 @@ plt.show()
 #me guardo la señal filtrada
 sf.write('miles_filtrado.wav', array_filtrado_dic_filt, 48000)
 
-# Quinta Consigna: Funcion conversion a escala logaritmica normalizada
+#Quinta Consigna: Funcion conversion a escala logaritmica normalizada
 
-# def conversion_log_norm(RI):
-#     """
-#     Recibe como argumento un array (la respuesta al impulso con escala lineal)
+def conversion_log_norm(RI):
+    """
+    Recibe como argumento un array (la respuesta al impulso con escala lineal)
     
-#     Devuelve el mismo array pero convertido a escala logaritmica
-#     """
-#     RI_max = max(np.abs(RI))
-#     RI_log = 20*np.log10(RI/(RI_max))
-#     return RI_log
+    Devuelve el mismo array pero convertido a escala logaritmica
+    """
+    RI_max = max(np.abs(RI))
+    RI_log = 20*np.log10(RI/(RI_max))
+    return RI_log
 
-# sint_log_norm = conversion_log_norm(sint)
+sint_log_norm = conversion_log_norm(sint)
 
-# plt.figure(1)
-# grafico_lineal = dominio_temporal((sint, 44100))
+plt.figure(1)
+grafico_lineal = dominio_temporal((sint, 44100))
 
-# plt.figure(2)
-# grafico_log = dominio_temporal((sint_log_norm, 44100))
+plt.figure(2)
+grafico_log = dominio_temporal((sint_log_norm, 44100))
 
 

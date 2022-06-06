@@ -13,6 +13,42 @@ import sounddevice as sd
 import pandas as pd
 from scipy import signal
 import scipy.integrate as integrate
+from numpy.linalg import inv
+
+# EPS = np.finfo(float).eps
+def valor_min(vector):
+    vector = abs(vector)
+    minimo = 1
+    for i in vector:
+        if i < minimo and i != 0:
+            minimo = i
+    return minimo      
+
+def elimina_inicio(vector):
+    indice_max = np.argmax(vector)
+    return vector[indice_max:]
+
+def reemplaza_ceros(vector):
+    minimo = valor_min(vector)
+    for i in range(len(vector)):
+        if vector[i] == 0 :
+            vector[i] = minimo    
+    return vector
+
+def corta_inf(vector):
+    output = []
+    for val in vector:
+         if np.isfinite(val):
+              output.append(val)
+    return output
+
+def elimina_valores(vector, valor):
+    output = []
+    for val in vector:
+         if val != valor:
+              output.append(val)
+    return output
+
 
 def dominio_temporal(data):
     """
@@ -34,14 +70,15 @@ def dominio_temporal(data):
     #Eje y: amplitud normalizada
     eje_y = archivo
     plt.ylabel("Amplitud Normalizada")
-    plt.yscale('log')
+    # plt.yscale('log')
     
     plt.title("Gráfico: Dominio temporal de la señal")
     plt.plot(eje_x, eje_y)
-    return plt.show()      
+    plt.show()      
 
 
 #Primera consigna: Realizar una función que aplique un suavizado a la señal
+
 
 ##filtro de media movil    
 def filtro_media_movil(archivo):
@@ -60,32 +97,28 @@ def filtro_media_movil(archivo):
         array con la señal filtrada.
 
     '''
-    ventana = 10
+    ventana = 501
     suavizada = np.zeros(len(archivo)-ventana)
     for i in range(0, len(archivo)-ventana):
         suavizada[i] = np.mean(archivo[i:i+ventana])
     #compenzamos el delay concatenando ceros al array
-    suavizada = np.hstack([np.zeros(ventana//2), suavizada])
+    #suavizada = np.hstack([np.zeros(ventana//2), suavizada])
     return suavizada
 
 
 #prueba
 resp_imp, fs = sf.read('usina_main_s1_p5.wav')
+resp_imp = resp_imp[:,0]
+resp_imp = elimina_inicio(resp_imp)
+resp_imp = abs(resp_imp)
 
 # #quito el ruido de fondo inicial ?
 # resp_imp = resp_imp[int(0.09)*fs:len(resp_imp)]
 
 resp_imp_media_movil = filtro_media_movil(resp_imp)
+# resp_imp = reemplaza_ceros(resp_imp) 
+# resp_imp_db = 20.0 * np.log10(abs(resp_imp))
 
-##grafico
-plt.figure(1)
-grafico_1 = dominio_temporal((resp_imp, fs))
-
-plt.figure(2)
-grafico_2 = dominio_temporal((resp_imp_media_movil, fs))
-
-##suena
-sd.play(resp_imp_media_movil)
 
 ##Comentar sobre el resultado obtenido. ¿Qué está visualizando? 
 ##comparar con la señal original en el mismo gráfico.
@@ -116,65 +149,93 @@ def integral_de_schroeder(resp_imp, fs):
     t = len(resp_imp)/fs
     n = len(resp_imp)
     extr_inf = 0
-    extr_sup = t*1000 #lo hago tender a un numero muy grande
-    delta_int = (extr_sup - extr_inf)/n
+    extr_sup = t 
+    delta_int = ((extr_sup - extr_inf)*fs)/n
     
-    resp_imp = (resp_imp[::-1])**2
+    resp_imp = resp_imp ** 2
     resultado = delta_int*np.cumsum(resp_imp)
-    resultado = resultado[::-1]
-    
-    #grafica resultados
-    # length = resultado.shape[0]/fs
-    # time = np.linspace(0, length, resultado.shape[0])
-    # plt.rcParams['figure.figsize'] = (10,5) # set plot size
-    # plt.scatter(time,resultado)
-    # plt.xlabel("Tiempo [s]")
-    # plt.ylabel("Amplitud [dB]")
+     
 
     return resultado
     
-sch = integral_de_schroeder(resp_imp_media_movil, fs)    
-#sch_db = 10.0 * np.log10(sch / np.max(sch))
+sch = integral_de_schroeder(resp_imp_media_movil, fs)
+# sch = sch[-1]-sch
+schroeder = sch[-1] - sch #integral hasta el final - integral en cada valor 
+schroeder = schroeder[:-1] #elimino el ultimo valor (=0)
+schroeder_db = 10*np.log10(schroeder/max(schroeder))
 
-
-# length = sch.shape[0]/fs
-# time = np.linspace(0, length, sch.shape[0])
-# plt.figure(1)
-# plt.plot(time, resp_imp_media_movil, 'b--')
-# plt.xlabel('Tiempo [s]')
-# plt.ylabel('Amplitud')
-# plt.title('comparacion')
-# plt.plot(time, sch, 'r')
-# plt.grid()
-
-dominio_temporal((sch, fs))
-
-# sd.play(sch, fs)
 
 #Comentar lo que se observa en la visualización.
+resp_imp_media_movil_db = 20*np.log10(resp_imp_media_movil/max(resp_imp_media_movil))
 
 
+##Tercera consigna
 
-#Tercera consigna
+
+def elimina_inf(vector):
+    for i in range(0, len(vector)):
+        if np.isfinite(vector[i]) == True:
+            np.hstack((vector, vector[i]))    
+    return vector
+    
+
+
+# sch_db = corta_inf(sch_db)
 
 #Funcion regresion lineal por cuadrados minimos
+def regr_cuad_min(vector_x, vector_y, grado=1):
+    columnas = grado + 1
+    filas = len(vector_x)
+    M = np.zeros([filas, columnas])
+    for i in range(0, filas):
+        for j in range(0, columnas):
+            M[i, j] = (vector_x[i])**j
+    #print(M) 
+    T = M.transpose()
+    M_coef = inv((T@M))@(T@vector_y)    
+    M_coef = M_coef[::-1]
+    return M_coef
 
-#el output es en dBFS .?
+abcisa = np.linspace(0, len(schroeder_db)/fs, len(schroeder_db))
+coefs = regr_cuad_min(abcisa, schroeder_db) 
+
+
+interpolacion = np.polyval(coefs, abcisa)
 
 
 #Funciones para calcular los parámetros acústicos según Norma ISO 3382
 
-#Funcion EDT
+#para calcular inicial, final
+def hallar_caida(vector, valor_caida):
+    abcisa_caida = 0
+    for i in range(0, len(vector)):
+        if vector[i] <= -valor_caida:
+            abcisa_caida = i
+            break
+    return abcisa_caida 
+
+#regresion entre
+def regresion_entre(vector_x, vector_y, inicial, final):
+    coefs = regr_cuad_min(vector_x, vector_y)
+    salida = np.polyval(coefs, vector_x)
+    return salida[inicial:final]
+       
+def edt(vector, fs):
+    tiempo = np.linspace(0, len(vector)/fs, len(vector))
+    inicial = 0
+    final = hallar_caida(vector, 10)
+    recta = regresion_entre(tiempo, vector, inicial, final)
+    return 6 * len(recta) / fs
 
 #Funcion T60 a partir del T10, T20, T30
-def T_60(archivo, fs, metodo):
+def t_60(vector, fs, metodo):
     '''
     Calcula el T60 a partir del T_10, T_20 o T_30.
 
     ---> Para calcular el T60 la funcion busca el valor de -5 dBFS en el array 
-         y realiza una resta entre la pre imagen de ese punto con el punto de 
-         caida -15,-25 o -35 dBFS, dependiendo de la opcion que se haya elegido, 
-         luego multiplica ese valor por 6, 3 o 2 y se obtiene el T60.
+          y realiza una resta entre la pre imagen de ese punto con el punto de 
+          caida -15,-25 o -35 dBFS, dependiendo de la opcion que se haya elegido, 
+          luego multiplica ese valor por 6, 3 o 2 y se obtiene el T60.
 
     Parameters
     ----------
@@ -186,8 +247,8 @@ def T_60(archivo, fs, metodo):
         tipo de tiempo de reverberacion a partir de los cuales la función
         calculará el T_60. 
         Por ejemplo, si 'T_10' la función calcula a partir del T_10, 
-                     si 'T_20' la función calcula a partir del T_20,
-                     SI 'T_30' la función calcula a partir del T_30.
+                      si 'T_20' la función calcula a partir del T_20,
+                      si 'T_30' la función calcula a partir del T_30.
 
     Returns
     -------
@@ -195,45 +256,47 @@ def T_60(archivo, fs, metodo):
     
 
     '''
-    if metodo == 'T_10':
-        for i in archivo:
-            if archivo[i] == -5:
-                pre_im = i
-            if archivo[i] == -15:
-                pre_im_caida = i
-        muestra_t60 = pre_im_caida-pre_im    
-        t_60 = muestra_t60/fs
+    tiempo = np.linspace(0, len(vector)/fs, len(vector))
+    multiplicador = {'t_10': 6, 't_20': 3, 't_30': 2}
+    if metodo == 't_10':
+        inicial = hallar_caida(vector, 5)
+        final = hallar_caida(vector, 15)
+        recta = regresion_entre(tiempo, vector, inicial, final)
+        
+    if metodo == 't_20':
+        inicial = hallar_caida(vector, 5)
+        final = hallar_caida(vector, 25)
+        recta = regresion_entre(tiempo, vector, inicial, final)
     
-    if metodo == 'T_20':
-        for i in archivo:
-            if archivo[i] == -5:
-                pre_im = i
-            if archivo[i] == -25:
-                pre_im_caida = i
-        muestra_t60 = pre_im_caida-pre_im    
-        t_60 = muestra_t60/fs
-    return t_60
   
-    if metodo == 'T_30':
-        for i in archivo:
-            if archivo[i] == -5:
-                pre_im = i
-            if archivo[i] == -35:
-                pre_im_caida = i
-        muestra_t60 = pre_im_caida-pre_im    
-        t_60 = muestra_t60/fs
+    if metodo == 't_30':
+        inicial = hallar_caida(vector, 5)
+        final = hallar_caida(vector, 35)
+        recta = regresion_entre(tiempo, vector, inicial, final)
 
-    return t_60
+    return multiplicador[metodo] * (len(recta)) / fs
 
 
+t60 = t_60(schroeder_db, 48000, 't_30')
 
-#prueba 
-#voy a armar un array con valores y testearla
-
-
-#Funcion D50
 
 #Funcion C80
+def c_80(vector, fs):
+    tiempo = np.linspace(0, len(vector)/fs, len(vector))
+    
+    delta_t = tiempo[1] - tiempo[0]
+    integral = delta_t * np.cumsum(vector ** 2) #integral hasta
+    muestra_80 = int((80/1000) * fs)
+    return 10 * np.log10(integral[muestra_80] / (integral[-1] - integral[muestra_80]))
+    
+#Funcion D50
+def d_50(vector, fs):
+    tiempo = np.linspace(0, len(vector)/fs, len(vector))
+    
+    delta_t = tiempo[1] - tiempo[0]
+    integral = delta_t * np.cumsum(vector ** 2) #integral hasta
+    muestra_50 = int((50/1000) * fs)
+    return 100 * integral[muestra_50] / (integral[-1])
 
 
 
