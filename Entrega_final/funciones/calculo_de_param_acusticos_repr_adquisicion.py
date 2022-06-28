@@ -42,11 +42,11 @@ filtrada_ss_grabado = filtrado(resp_imp_ss_grabado_log, 48000, 'o', 1000)
 # suavizo la señal
 suavizada_ss_grabado = filtro_media_movil(filtrada_ss_grabado[1])
 
-#integral de schroeder (para qué?)
+#integral de schroeder
 integral_ss_grabado = integral_de_schroeder(suavizada_ss_grabado, 48000)
 
 # #calculo la recta de regresion 
-regr_lineal_ss_grabado = regr_cuad_min(integral_ss_grabado, 48000)
+# regr_lineal_ss_grabado = regr_cuad_min(integral_ss_grabado, 48000)
 
 # #calculo de parámetros acústicos
 # valor_edt = edt(regr_lineal, fs)

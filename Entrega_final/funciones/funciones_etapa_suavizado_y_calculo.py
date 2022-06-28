@@ -14,7 +14,7 @@ from funciones_intermedias import hallar_caida
     
 
 #Función suavizado de la señal (filtro de media móvil)    
-def filtro_media_movil(archivo):
+def filtro_media_movil(vector):
     '''
     Aplica el filtro de media móvil a una señal de entrada, utilizando una
     ventana fija de 501 muestras. 
@@ -31,9 +31,9 @@ def filtro_media_movil(archivo):
 
     '''
     ventana = 501
-    suavizada = np.zeros(len(archivo) - ventana)
-    for i in range(0, len(archivo)-ventana):
-        suavizada[i] = np.mean(archivo[i:i+ventana])
+    suavizada = np.zeros(len(vector) - ventana)
+    for i in range(0, len(vector)-ventana):
+        suavizada[i] = np.mean(vector[i:i+ventana])
     print(len(suavizada))
     print(np.shape(suavizada))
     print(suavizada)    
@@ -110,10 +110,10 @@ def regr_cuad_min(vector, fs, grado=1):
     T = M.transpose()
     M_coef = inv((T@M))@(T@vector_y)    
     M_coef = M_coef[::-1]
-    R = np.corrcoef(M_coef)
+    #R = np.corrcoef(M_coef)
     interpolacion = np.polyval(M_coef, vector_x)
 
-    return interpolacion, R
+    return interpolacion
 
 def regresion_entre(vector_x, vector_y, inicial, final):
     '''
@@ -271,15 +271,51 @@ def c_80(vector, fs):
     return resultado
 
     
+def regresion_entre_np(vector_x, vector_y, inicial, final):
+    '''
+    Realiza la regresión lineal entre los valores de la imagen de una señal 
+    y los valores de su pre-imagen dentro de un intervalo dado [final-inicial]
+
+    Parametros
+    ----------
+    vector_x : Numpy Array
+        vector correspondiente a los valores de la pre-imagen. Por ej: eje temporal
+    vector_y : Numpy Array
+        vector correspondiente a los valores de la imagen.
+    inicial : int
+        primer valor del intervalo.
+    final : int
+        último valor del intervalo.
+
+    Returns
+    -------
+    salida: Numpy Array
+        señal que representa la recta de regresión entre el intervalo dado.
+
+    '''
+    A = np.vstack([vector_x, np.ones(len(vector_x))]).T
+    m, c = np.linalg.lstsq(A, vector_y)
+    R = np.corrcoef(vector_x,vector_y)
+    return m, c , R
+
+
+
 if __name__ == '__main__':
     elveden, fs = sf.read('elveden_hall_suffolk_england.wav')
+    sd.play(elveden)
     elveden = elveden[:, 0]
     
     #suavizo la señal
     suavizada_elveden = filtro_media_movil(elveden)
-    from funciones_grafico_de_dominio_temporal import dominio_temporal
-    dominio_temporal((elveden, fs))
+    # from funciones_grafico_de_dominio_temporal import dominio_temporal
+    # dominio_temporal((elveden, fs))
+    integral_elveden = integral_de_schroeder(suavizada_elveden, fs)
     
+    vector_tiempo = np.linspace(0, len(elveden)/fs, len(elveden))
+    
+    regresion_entre_np(vector_tiempo, elveden, 0, len(elveden))
+    
+
 
 
 

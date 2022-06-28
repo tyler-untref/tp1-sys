@@ -55,7 +55,10 @@ integral_sint_log = conversion_log_norm(integral_sint)
 # dominio_temporal((integral_sint_log, 48000))
 
 #calculo la recta de regresion 
-regr_lineal = regr_cuad_min(integral_sint_log, 48000)
+# regr_lineal = regr_cuad_min(integral_sint_log, 48000)
+
+#usando la funcion de numpy de least squares
+
 
 # dominio_temporal_2(integral_sint_log, regr_lineal, 48000)
 
